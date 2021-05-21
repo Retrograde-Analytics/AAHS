@@ -1,0 +1,90 @@
+---
+title: "African American Historical Sites in Philadelphia"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: columns
+    vertical_layout: fill
+---
+
+```{r setup, include=FALSE}
+library(flexdashboard)
+library(dplyr)
+library(readxl)
+library(ggmap)
+library(tidyverse)
+library(leaflet)
+library(DT)
+
+
+## Import dataset
+
+data <- read_xlsx("AAHS.xlsx")
+
+
+
+```
+
+# Map
+
+Column {data-width=650}
+-----------------------------------------------------------------------
+
+### Map of AAHS (Philadelphia)
+
+
+```{r}
+
+map <- leaflet(data) %>%
+  addTiles() %>%
+  addProviderTiles("Esri.WorldTopoMap") %>%
+  addMarkers(lng= ~lon, lat= ~lat, 
+             popup = ~paste(
+               paste('<b>', 'Name:', '</b>', Site_Name), 
+               paste('<b>',  'Address:', '</b>', full_address),
+               paste('<b>', 'Type:', '</b>', Type_of_Historic_Resource),
+               paste('<b>', 'Date Built/Architect:',  '</b>', Date_Built_Architect),
+               sep = '<br/>'))
+
+map
+
+```
+
+Column {data-width=350}
+-----------------------------------------------------------------------
+
+### Info
+
+#### Dashboard
+
+This dashboard contains an interactive map that shows the locations of and general information about African American historical sites in Philadelphia. The dataset that the map is built on was created and maintained by the [Preservation Alliance](http://www.preservationalliance.com/) Whose mission is "to actively promote the appreciation, protection, appropriate use, and development of the Philadelphia region's historic buildings, communities, and landscapes."
+
+The original dataset can be viewed on the second page of this dashboard or [here](http://www.preservationalliance.com/inventory-african-american-historic-sites/). 
+
+It was accessed by the author of this dashboard through [Open Data Philly](https://www.opendataphilly.org/).
+
+#### Author
+
+This dashboard was created by [Retrograde Analytics](https://www.retrograde-analytics.com/), whose mission is to wield the power of big data to help those who wish to use it for the greater good.s
+
+
+# Dataset
+
+Column {data-width=1000}
+-----------------------------------------------------------------------
+
+### Dataset
+
+```{r}
+
+datatable(data %>% select(-one_of('lat', 'lon', 
+                                       'full_address', 'Photo')),
+          options = list(
+            scrollY="475px",
+            scrollX=TRUE, 
+            pageLength = 100,
+            dom = 'Bfrtip')
+          )
+
+
+```
+
